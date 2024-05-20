@@ -16,12 +16,19 @@ local function isPlayerAlive(player)
 	return false
 end
 
+local function hasForceField(player)
+	if player.Character and player.Character:FindFirstChild("ForceField") then
+		return true
+	end
+	return false
+end
+
 local function getNearestPlayer()
 	local nearestPlayer = nil
 	local shortestDistance = math.huge
 
 	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= localPlayer and isPlayerAlive(player) then
+		if player ~= localPlayer and isPlayerAlive(player) and not hasForceField(player) then
 			local distance = (localPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
 			if distance < shortestDistance then
 				shortestDistance = distance
@@ -41,6 +48,10 @@ local function tpAura()
 	local savedCFrame = humanoidRootPart.CFrame
 
 	local nearestPlayer = getNearestPlayer()
+	while nearestPlayer and hasForceField(nearestPlayer) do
+		nearestPlayer = getNearestPlayer()
+	end
+
 	if nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("HumanoidRootPart") then
 		local targetPosition = nearestPlayer.Character.HumanoidRootPart.Position
 		local direction = (targetPosition - humanoidRootPart.Position).unit
