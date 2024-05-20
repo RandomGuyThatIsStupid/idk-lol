@@ -5,19 +5,24 @@ local localPlayer = Players.LocalPlayer
 
 local tpAuraEnabled = false
 local interval = 1
-local setBackTime = 0
+local setBackTime = 0.5
 
 local wasTpAuraEnabledBeforeDeath = false
 
 local function isPlayerAlive(player)
-	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
-		return player.Character.Humanoid.Health > 0
+	local character = player.Character
+	if character then
+		local humanoid = character:FindFirstChild("Humanoid")
+		if humanoid and humanoid.Health > 0 then
+			return true
+		end
 	end
 	return false
 end
 
 local function hasForceField(player)
-	if player.Character and player.Character:FindFirstChild("ForceField") then
+	local character = player.Character
+	if character and character:FindFirstChild("ForceField") then
 		return true
 	end
 	return false
@@ -44,7 +49,6 @@ local function tpAura()
 	if not tpAuraEnabled or not isPlayerAlive(localPlayer) then return end
 
 	local humanoidRootPart = localPlayer.Character:WaitForChild("HumanoidRootPart")
-	local savedPosition = humanoidRootPart.Position
 	local savedCFrame = humanoidRootPart.CFrame
 
 	local nearestPlayer = getNearestPlayer()
@@ -53,11 +57,11 @@ local function tpAura()
 	end
 
 	if nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local targetPosition = nearestPlayer.Character.HumanoidRootPart.Position
-		local direction = (targetPosition - humanoidRootPart.Position).unit
-		local backPosition = targetPosition - direction * 2
+		local targetHRP = nearestPlayer.Character.HumanoidRootPart
+		local backOffset = targetHRP.CFrame.lookVector * -2
+		local backPosition = targetHRP.Position + backOffset
 
-		humanoidRootPart.CFrame = CFrame.new(backPosition, targetPosition)
+		humanoidRootPart.CFrame = CFrame.new(backPosition, targetHRP.Position)
 
 		task.wait(setBackTime)
 
