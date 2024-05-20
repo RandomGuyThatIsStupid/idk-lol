@@ -5,7 +5,7 @@ local localPlayer = Players.LocalPlayer
 
 local tpAuraEnabled = false
 local interval = 1
-local setBackTime = 0.5
+local setBackTime = 0
 
 local wasTpAuraEnabledBeforeDeath = false
 
